@@ -24,7 +24,19 @@ var (
 )
 
 const (
-// this line is used by starport scaffolding # simapp/module/const
+	opWeightMsgBuyName = "op_weight_msg_buy_name"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgBuyName int = 100
+
+	opWeightMsgSetName = "op_weight_msg_set_name"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgSetName int = 100
+
+	opWeightMsgDeleteName = "op_weight_msg_delete_name"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgDeleteName int = 100
+
+	// this line is used by starport scaffolding # simapp/module/const
 )
 
 // GenerateGenesisState creates a randomized GenState of the module
@@ -57,6 +69,39 @@ func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 // WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
+
+	var weightMsgBuyName int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgBuyName, &weightMsgBuyName, nil,
+		func(_ *rand.Rand) {
+			weightMsgBuyName = defaultWeightMsgBuyName
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgBuyName,
+		nameservicesimulation.SimulateMsgBuyName(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgSetName int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgSetName, &weightMsgSetName, nil,
+		func(_ *rand.Rand) {
+			weightMsgSetName = defaultWeightMsgSetName
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgSetName,
+		nameservicesimulation.SimulateMsgSetName(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgDeleteName int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDeleteName, &weightMsgDeleteName, nil,
+		func(_ *rand.Rand) {
+			weightMsgDeleteName = defaultWeightMsgDeleteName
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgDeleteName,
+		nameservicesimulation.SimulateMsgDeleteName(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
 
